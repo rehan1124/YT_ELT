@@ -8,6 +8,8 @@ using the YouTube Data API v3.
 - Python 3.10 or newer
 - A Google API key with the YouTube Data API v3 enabled
 
+This project was created using Python 3.14.6.
+
 ## Setup
 
 From the repository directory, create and activate a virtual environment:
