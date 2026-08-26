@@ -26,19 +26,12 @@ def get_playlist_id():
         response = requests.get(CHANNELS_LIST_URL)
         response.raise_for_status()
 
-        http_code = response.status_code
         json_response = response.json()
-
-        # print(f"HTTP Code: {http_code}")
-        # print(f"JSON Response: {json.dumps(json_response, indent=4)}")
 
         channel_items = json_response.get("items", [])
         channel_playlist_id = channel_items[0]["contentDetails"]["relatedPlaylists"][
             "uploads"
         ]
-
-        # print(f"Channel items: {channel_items}")
-        # print(f"Channel Playlist ID: {channel_playlist_id}")
 
         return channel_playlist_id
     except requests.exceptions.RequestException as e:
@@ -46,27 +39,23 @@ def get_playlist_id():
         raise e
 
 
-def get_playlist_items(playlist_id):
+def get_playlist_items(playlist_id, page_token=None):
     """
     Get the items in a playlist using the YouTube Data API.
     Args:
         playlist_id (str): The ID of the playlist.
+        page_token (str, optional): The token for the next page of results.
     Returns:
         list: A list of playlist items with additional information.
     """
     try:
         response = requests.get(
-            f"{YT_URL}/playlistItems?part={PART}&playlistId={playlist_id}&maxResults={MAX_RESULTS}&key={API_KEY}"
+            f"{YT_URL}/playlistItems?part={PART}&playlistId={playlist_id}&maxResults={MAX_RESULTS}&key={API_KEY}&pageToken={page_token if page_token else ''}"
         )
         response.raise_for_status()
 
-        http_code = response.status_code
         json_response = response.json()
 
-        # print(f"HTTP Code: {http_code}")
-        # print(f"JSON Response: {json.dumps(json_response, indent=4)}")
-
-        # playlist_items = json_response.get("items", [])
         playlist_items = json_response
         return playlist_items
     except requests.exceptions.RequestException as e:
@@ -76,7 +65,26 @@ def get_playlist_items(playlist_id):
 if __name__ == "__main__":
 
     playlist_id = get_playlist_id()
-    print(f"Playlist ID: {playlist_id}")
 
     playlist_items = get_playlist_items(playlist_id)
-    print(f"Playlist Items: {json.dumps(playlist_items, indent=4)}")
+
+    next_page_token = playlist_items.get("nextPageToken")
+
+    video_items = playlist_items.get("items", [])
+    video_ids = [item["contentDetails"]["videoId"] for item in video_items]
+
+    while next_page_token:
+        playlist_items = get_playlist_items(playlist_id, next_page_token)
+
+        next_page_token = playlist_items.get("nextPageToken")
+
+        video_items.extend(playlist_items.get("items", []))
+        video_ids.extend(
+            [
+                item["contentDetails"]["videoId"]
+                for item in playlist_items.get("items", [])
+            ]
+        )
+
+    print(f"Total Video IDs: {len(video_ids)}")
+    print(f"Video IDs: {video_ids}")
