@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 import os
 from dotenv import load_dotenv
 
@@ -10,6 +11,8 @@ YT_URL = os.getenv("YT_URL")
 FOR_HANDLE = "naveenautomationlabs"
 MAX_RESULTS = 50
 PART = "contentDetails"
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 CHANNELS_LIST_URL = (
     f"{YT_URL}/channels?part={PART}&forHandle={FOR_HANDLE}&key={API_KEY}"
@@ -62,6 +65,11 @@ def get_playlist_items(playlist_id, page_token=None):
         raise e
 
 
+def _get_video_ids(playlist_items):
+    """Return video IDs from a YouTube playlist-items response."""
+    return [item["contentDetails"]["videoId"] for item in playlist_items.get("items", [])]
+
+
 if __name__ == "__main__":
 
     playlist_id = get_playlist_id()
@@ -70,21 +78,35 @@ if __name__ == "__main__":
 
     next_page_token = playlist_items.get("nextPageToken")
 
-    video_items = playlist_items.get("items", [])
-    video_ids = [item["contentDetails"]["videoId"] for item in video_items]
+    video_ids = _get_video_ids(playlist_items)
+    total_results = playlist_items.get("pageInfo", {}).get("totalResults")
+    page_number = 1
+    logging.info(
+        "Fetched page %s: %s videos%s",
+        page_number,
+        len(video_ids),
+        f" of {total_results}" if total_results else "",
+    )
 
     while next_page_token:
         playlist_items = get_playlist_items(playlist_id, next_page_token)
 
         next_page_token = playlist_items.get("nextPageToken")
 
-        video_items.extend(playlist_items.get("items", []))
-        video_ids.extend(
-            [
-                item["contentDetails"]["videoId"]
-                for item in playlist_items.get("items", [])
-            ]
+        video_ids.extend(_get_video_ids(playlist_items))
+        page_number += 1
+        progress = (
+            f" ({len(video_ids) / total_results:.0%})"
+            if total_results
+            else ""
+        )
+        logging.info(
+            "Fetched page %s: %s videos%s%s",
+            page_number,
+            len(video_ids),
+            f" of {total_results}" if total_results else "",
+            progress,
         )
 
-    print(f"Total Video IDs: {len(video_ids)}")
-    print(f"Video IDs: {video_ids}")
+    logging.info("Total Video IDs: %s", len(video_ids))
+    logging.info("Video IDs: %s", video_ids)
