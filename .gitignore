@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# YouTube stats run output (one sample kept in the repo, see data/logs/)
+data/logs/*
