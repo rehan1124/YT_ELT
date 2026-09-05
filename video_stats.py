@@ -166,6 +166,11 @@ def _save_stats_to_file(stats):
 
 
 if __name__ == "__main__":
+
+    """
+    Main execution block to fetch video statistics from a YouTube channel's uploads playlist.
+    """
+
     playlist_id = get_playlist_id()
     video_ids = get_all_video_ids(playlist_id)
 
