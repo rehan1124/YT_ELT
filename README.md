@@ -51,15 +51,18 @@ it to `.env` if `.env` does not already exist, then set the API key value:
 copy .env.example .env
 ```
 
-Edit `.env` so it contains both required values:
+Edit `.env` so it contains all three required values:
 
 ```dotenv
 API_KEY=your-youtube-data-api-key
 YT_URL=https://youtube.googleapis.com/youtube/v3
+CHANNEL_HANDLE=naveenautomationlabs
 ```
 
-`API_KEY` is your Google API key and `YT_URL` is the base URL of the YouTube
-Data API v3. Both are read at startup, and requests fail if either is missing.
+`API_KEY` is your Google API key, `YT_URL` is the base URL of the YouTube
+Data API v3, and `CHANNEL_HANDLE` is the handle of the channel to collect
+statistics for, without the leading `@`. All three are read at startup, and the
+script exits immediately if any of them is missing.
 
 Create the key in Google Cloud Console, enable **YouTube Data API v3** for the
 project, and keep the key private. The `.env` file is intended for local use and
@@ -84,5 +87,5 @@ log as each page arrives, for example:
 
 When paging finishes it logs the total count and the full list of video IDs.
 
-The channel handle is currently configured in `video_stats.py` as
-`naveenautomationlabs`.
+The channel handle is read from the `CHANNEL_HANDLE` environment variable, so a
+different channel can be collected by editing `.env` without changing any code.

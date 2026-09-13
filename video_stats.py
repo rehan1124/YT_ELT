@@ -7,15 +7,17 @@ load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 YT_URL = os.getenv("YT_URL")
-FOR_HANDLE = "naveenautomationlabs"
+FOR_HANDLE = os.getenv("CHANNEL_HANDLE")
 MAX_RESULTS = 50
 PART = "contentDetails"
 TIMEOUT = 10
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
-if not API_KEY or not YT_URL:
-    raise SystemExit("API_KEY and YT_URL must be set in the environment or .env file")
+if not API_KEY or not YT_URL or not FOR_HANDLE:
+    raise SystemExit(
+        "API_KEY, YT_URL and CHANNEL_HANDLE must be set in the environment or .env file"
+    )
 
 
 def get_playlist_id():
