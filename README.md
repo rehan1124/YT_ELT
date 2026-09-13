@@ -68,6 +68,12 @@ Create the key in Google Cloud Console, enable **YouTube Data API v3** for the
 project, and keep the key private. The `.env` file is intended for local use and
 must not be committed.
 
+`.env.example` also lists Docker, Postgres and Airflow settings. Those belong to
+the containerised Airflow stack and are **not** needed to run `video_stats.py`
+directly — the three values above are enough. See [AIRFLOW.md](AIRFLOW.md) for
+what those components are and why they each need their own database and
+credentials.
+
 ## Run
 
 With the virtual environment activated and `.env` configured:
