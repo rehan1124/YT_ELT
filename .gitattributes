@@ -1,0 +1,10 @@
+# Normalise line endings. Without this, core.autocrlf=true on Windows checks
+# shell scripts out with CRLF, and a CRLF script bind-mounted into a Linux
+# container fails with "bad interpreter: /bin/bash^M".
+* text=auto
+
+# Must stay LF - these run inside Linux containers.
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+docker-compose.yaml text eol=lf
+.env.example    text eol=lf
